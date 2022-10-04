@@ -4,7 +4,7 @@ namespace Uploader.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PingController : ControllerBase
+public sealed class PingController : ControllerBase
 {
     [HttpGet]
     public IActionResult Index()

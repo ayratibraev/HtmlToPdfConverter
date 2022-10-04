@@ -1,19 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
 using Uploader.Application.Notifications;
 
 namespace Uploader.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class FilesController : ControllerBase
+    public sealed class FilesController : ControllerBase
     {
         private readonly IMediator _mediator;
 
@@ -34,7 +27,7 @@ namespace Uploader.Controllers
                 }
             }
 
-            await _mediator.Publish(new FileUploadedNotification(filePath));
+            await _mediator.Publish(new HtmlUploadedNotification(filePath));
 
             return Ok(new { name = Path.GetFileName(filePath), file.Length });
         }

@@ -1,4 +1,5 @@
 using MediatR;
+using Uploader.Application.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program));
+builder.Services.AddHostedService<PdfReadyCheckHostedService>();
 
 var app = builder.Build();
 
