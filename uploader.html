@@ -1,0 +1,48 @@
+<html>
+<head></head>
+<body>
+<H1>Simple html file to pdf convertation service</H1>
+<dl>
+    <dd>
+        <input id="file" type="file" accept=".html"/>
+    </dd>
+    <br>
+    <dd>
+        <input id="submit" type="submit" value="Upload" />
+    </dd>
+    <br>
+    <dd>
+        <input id="ping" type="submit" value="Ping" />
+    </dd>
+    <div style="margin-top:15px">
+        <output name="result"></output>
+    </div>
+</dl>
+</body>
+
+<script>
+    "use strict";
+    document.getElementById('submit').addEventListener('click', () => {
+        let file = document.getElementById("file").files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+        formData.append('fileName', file.name);        
+        fetch('https://localhost:7123/api/files/upload', {method: "POST", body: formData})
+            .then(response => response.text())
+            .then(response => document.querySelector('output').textContent = response);
+    });
+
+    document.getElementById('ping').addEventListener('click', () => {
+        fetch('https://localhost:7123/api/ping', {method: "GET"})
+            .then(response => response.text())
+            .then(response => document.querySelector('output').textContent = response)
+            .catch(error => document.querySelector('output').textContent = error);
+    });
+    
+</script>
+
+<style>
+
+</style>
+
+</html>
