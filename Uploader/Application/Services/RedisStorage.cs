@@ -20,15 +20,16 @@ public class RedisStorage : IStorage
 
     public string? Download()
     {
-        var pdf = _db.StringGet("html_file");
+        var tran = _db.CreateTransaction();
+        var getResult = tran.StringGetAsync("html_file");
+        tran.KeyDeleteAsync("html_file");
+        tran.Execute();
+        var value = getResult.Result;
 
-        if (pdf.HasValue)
-        {
-            var path = Path.GetTempFileName();
-            File.WriteAllText(path, pdf.ToString());
-            return path;
-        }
-
-        return null;
+        if (!value.HasValue) return null;
+        
+        var path = Path.GetTempFileName();
+        File.WriteAllText(path, value.ToString());
+        return path;
     }
 }
