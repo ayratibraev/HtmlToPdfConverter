@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
+using Uploader.Application.Notifications;
 
 namespace Uploader.Controllers
 {
@@ -13,6 +15,13 @@ namespace Uploader.Controllers
     [Route("api/[controller]")]
     public class FilesController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public FilesController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
         {
@@ -24,12 +33,8 @@ namespace Uploader.Controllers
                     await file.CopyToAsync(stream);
                 }
             }
-            
-            var redis = ConnectionMultiplexer.Connect("localhost");
-            var db = redis.GetDatabase();
 
-            var value = System.IO.File.ReadAllBytes(filePath);
-            db.StringSet("html_file", value);
+            await _mediator.Publish(new FileUploadedNotification(filePath));
 
             return Ok(new { name = Path.GetFileName(filePath), file.Length });
         }
