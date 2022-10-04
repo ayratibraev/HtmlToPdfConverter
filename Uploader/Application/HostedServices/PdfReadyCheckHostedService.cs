@@ -1,6 +1,7 @@
 using MediatR;
 using StackExchange.Redis;
 using Uploader.Application.Notifications;
+using Uploader.Application.Services.Interfaces;
 
 namespace Uploader.Application.HostedServices;
 
@@ -8,15 +9,15 @@ public sealed class PdfReadyCheckHostedService: IHostedService, IDisposable
 {
     private int executionCount = 0;
     private readonly ILogger<PdfReadyCheckHostedService> _logger;
+    private readonly IStorage _storage;
     private readonly IMediator _mediatr;
     private Timer? _timer = null;
-    private readonly ConnectionMultiplexer _redis;
 
-    public PdfReadyCheckHostedService(ILogger<PdfReadyCheckHostedService> logger, IMediator mediatr)
+    public PdfReadyCheckHostedService(ILogger<PdfReadyCheckHostedService> logger, IStorage storage, IMediator mediatr)
     {
         _logger = logger;
+        _storage = storage;
         _mediatr = mediatr;
-        _redis = ConnectionMultiplexer.Connect("localhost");
     }
 
     public Task StartAsync(CancellationToken stoppingToken)
@@ -32,15 +33,11 @@ public sealed class PdfReadyCheckHostedService: IHostedService, IDisposable
     private void DoWork(object? state)
     {
         var count = Interlocked.Increment(ref executionCount);
-        
-        var db = _redis.GetDatabase();
-        var pdf = db.StringGet("html_file");
 
-        if (pdf.HasValue)
+        var filePath = _storage.Download();
+        if (string.IsNullOrEmpty(filePath) == false)
         {
-            var path = Path.GetTempFileName();
-            File.WriteAllText(path, pdf.ToString());
-            _mediatr.Publish(new PdfDownloadedNotification(path));
+            _mediatr.Publish(new PdfDownloadedNotification(filePath));   
         }
         
         _logger.LogInformation(

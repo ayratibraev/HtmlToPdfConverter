@@ -1,5 +1,6 @@
 using MediatR;
 using StackExchange.Redis;
+using Uploader.Application.Services.Interfaces;
 
 namespace Uploader.Application.Notifications;
 
@@ -15,14 +16,16 @@ public sealed class HtmlUploadedNotification : INotification
 
 public sealed class HtmlUploadedHandler : INotificationHandler<HtmlUploadedNotification>
 {
+    private readonly IStorage _storage;
+
+    public HtmlUploadedHandler(IStorage storage)
+    {
+        _storage = storage;
+    }
+
     public Task Handle(HtmlUploadedNotification notification, CancellationToken cancellationToken)
     {
-        var redis = ConnectionMultiplexer.Connect("localhost");
-        var db = redis.GetDatabase();
-
-        var value = System.IO.File.ReadAllBytes(notification.FilePath);
-        db.StringSet("html_file", value);
-
+        _storage.Upload(notification.FilePath);
         return Task.CompletedTask;
     }
 }
