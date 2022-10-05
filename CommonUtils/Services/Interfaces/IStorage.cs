@@ -1,4 +1,4 @@
-namespace Uploader.Application.Services.Interfaces;
+namespace CommonUtils.Services.Interfaces;
 
 public interface IStorage
 {

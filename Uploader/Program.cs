@@ -1,7 +1,7 @@
+using CommonUtils.Services;
+using CommonUtils.Services.Interfaces;
 using MediatR;
 using Uploader.Application.HostedServices;
-using Uploader.Application.Services;
-using Uploader.Application.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,7 +1,7 @@
+using CommonUtils.Services.Interfaces;
 using StackExchange.Redis;
-using Uploader.Application.Services.Interfaces;
 
-namespace Uploader.Application.Services;
+namespace CommonUtils.Services;
 
 public class RedisStorage : IStorage
 {

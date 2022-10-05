@@ -1,6 +1,5 @@
+using CommonUtils.Services.Interfaces;
 using MediatR;
-using StackExchange.Redis;
-using Uploader.Application.Services.Interfaces;
 
 namespace Uploader.Application.Notifications;
 

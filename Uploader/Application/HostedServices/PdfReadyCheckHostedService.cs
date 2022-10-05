@@ -1,7 +1,6 @@
+using CommonUtils.Services.Interfaces;
 using MediatR;
-using StackExchange.Redis;
 using Uploader.Application.Notifications;
-using Uploader.Application.Services.Interfaces;
 
 namespace Uploader.Application.HostedServices;
 
