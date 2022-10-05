@@ -1,3 +1,4 @@
+using System.Text;
 using CommonUtils.Services.Interfaces;
 using StackExchange.Redis;
 
@@ -29,7 +30,7 @@ public sealed class RedisStorage : IStorage
         if (!value.HasValue) return null;
         
         var path = Path.GetTempFileName();
-        File.WriteAllText(path, value.ToString());
+        File.WriteAllBytes(path, new UTF8Encoding().GetBytes(value.ToString()));
         return path;
     }
 

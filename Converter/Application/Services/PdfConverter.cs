@@ -7,14 +7,16 @@ public sealed class PdfConverter : IPdfConverter
 {
     public async Task<string> Convert(string filePath)
     {
-        var bfOptions = new BrowserFetcherOptions();
-        using var browserFetcher = new BrowserFetcher(bfOptions);
-        await browserFetcher.DownloadAsync();
-        await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
-        await using var page = await browser.NewPageAsync();
-        await page.GoToAsync("file://" + filePath);
+        await new BrowserFetcher().DownloadAsync();
+        var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        {
+            Headless = true
+        });
+        var page = await browser.NewPageAsync();
+        page.DefaultTimeout = 5000;
+        await page.GoToAsync("file://" + filePath, WaitUntilNavigation.Networkidle2);
         var pdfPath = Path.ChangeExtension(filePath, "pdf");
-        await page.PdfAsync(pdfPath);
+        page.PdfAsync(pdfPath).GetAwaiter().GetResult();
         return pdfPath;
     }
 }
