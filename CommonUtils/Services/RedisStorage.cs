@@ -3,7 +3,7 @@ using StackExchange.Redis;
 
 namespace CommonUtils.Services;
 
-public class RedisStorage : IStorage
+public sealed class RedisStorage : IStorage
 {
     private readonly IDatabase _db;
 
@@ -13,16 +13,16 @@ public class RedisStorage : IStorage
         _db = redis.GetDatabase();
     }
 
-    public void Upload(string filePath)
+    private void Upload(string filePath, string key)
     {
-        _db.StringSet("html_file", File.ReadAllBytes(filePath));
+        _db.StringSet(key, File.ReadAllBytes(filePath));
     }
 
-    public string? Download()
+    private string? Download(string key)
     {
         var tran = _db.CreateTransaction();
-        var getResult = tran.StringGetAsync("html_file");
-        tran.KeyDeleteAsync("html_file");
+        var getResult = tran.StringGetAsync(key);
+        tran.KeyDeleteAsync(key);
         tran.Execute();
         var value = getResult.Result;
 
@@ -31,5 +31,25 @@ public class RedisStorage : IStorage
         var path = Path.GetTempFileName();
         File.WriteAllText(path, value.ToString());
         return path;
+    }
+
+    public void UploadHtml(string filePath)
+    {
+        Upload(filePath, "html_file");
+    }
+
+    public string? DownloadHtml()
+    {
+        return Download("html_file");
+    }
+
+    public void UploadPdf(string filePath)
+    {
+        Upload(filePath, "pdf_file");
+    }
+
+    public string? DownloadPdf()
+    {
+        return Download("pdf_file");
     }
 }

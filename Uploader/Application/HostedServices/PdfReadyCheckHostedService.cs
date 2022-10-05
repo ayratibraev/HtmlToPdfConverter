@@ -6,7 +6,6 @@ namespace Uploader.Application.HostedServices;
 
 public sealed class PdfReadyCheckHostedService: IHostedService, IDisposable
 {
-    private int executionCount = 0;
     private readonly ILogger<PdfReadyCheckHostedService> _logger;
     private readonly IStorage _storage;
     private readonly IMediator _mediatr;
@@ -31,16 +30,11 @@ public sealed class PdfReadyCheckHostedService: IHostedService, IDisposable
 
     private void DoWork(object? state)
     {
-        var count = Interlocked.Increment(ref executionCount);
-
-        var filePath = _storage.Download();
+        var filePath = _storage.DownloadPdf();
         if (string.IsNullOrEmpty(filePath) == false)
         {
             _mediatr.Publish(new PdfDownloadedNotification(filePath));   
         }
-        
-        _logger.LogInformation(
-            "Timed Hosted Service is working. Count: {Count}", count);
     }
 
     public Task StopAsync(CancellationToken stoppingToken)

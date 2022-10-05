@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uploader", "Uploader\Upload
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "CommonUtils\CommonUtils.csproj", "{A7049567-A169-4F11-BF3E-D2D3C15FE85A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Converter", "Converter\Converter.csproj", "{00516E96-81C2-4082-91C0-72B4B935BDD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{A7049567-A169-4F11-BF3E-D2D3C15FE85A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7049567-A169-4F11-BF3E-D2D3C15FE85A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7049567-A169-4F11-BF3E-D2D3C15FE85A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00516E96-81C2-4082-91C0-72B4B935BDD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00516E96-81C2-4082-91C0-72B4B935BDD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00516E96-81C2-4082-91C0-72B4B935BDD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00516E96-81C2-4082-91C0-72B4B935BDD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

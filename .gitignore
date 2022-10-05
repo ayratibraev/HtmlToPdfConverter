@@ -3,3 +3,6 @@ Uploader/obj
 CommonUtils/bin
 CommonUtils/obj
 .idea
+Converter/bin
+Converter/obj
+Converter/.local-chromium

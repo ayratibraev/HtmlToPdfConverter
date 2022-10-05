@@ -23,7 +23,7 @@ public sealed class PdfDownloadedHandler : INotificationHandler<PdfDownloadedNot
 
     public Task Handle(PdfDownloadedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"Pdf downloaded in: {notification.FilePath}");
+        _logger.LogInformation("Pdf downloaded in: {0}", notification.FilePath);
         return Task.CompletedTask;
     }
 }

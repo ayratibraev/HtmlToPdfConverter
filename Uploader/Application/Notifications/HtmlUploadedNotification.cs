@@ -24,7 +24,7 @@ public sealed class HtmlUploadedHandler : INotificationHandler<HtmlUploadedNotif
 
     public Task Handle(HtmlUploadedNotification notification, CancellationToken cancellationToken)
     {
-        _storage.Upload(notification.FilePath);
+        _storage.UploadHtml(notification.FilePath);
         return Task.CompletedTask;
     }
 }
