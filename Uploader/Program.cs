@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program));
 builder.Services.AddHostedService<PdfReadyCheckHostedService>();
 builder.Services.AddSingleton<IStorage, RedisStorage>();
+builder.Services.AddSingleton<IFileSystem, FileSystem>();
 
 var app = builder.Build();
 

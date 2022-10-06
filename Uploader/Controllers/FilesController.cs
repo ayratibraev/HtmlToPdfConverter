@@ -1,3 +1,4 @@
+using CommonUtils.Services.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Uploader.Application.Notifications;
@@ -9,16 +10,18 @@ namespace Uploader.Controllers
     public sealed class FilesController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IFileSystem _fileSystem;
 
-        public FilesController(IMediator mediator)
+        public FilesController(IMediator mediator, IFileSystem fileSystem)
         {
             _mediator = mediator;
+            _fileSystem = fileSystem;
         }
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
         {
-            var filePath = Path.GetTempFileName();
+            var filePath = _fileSystem.GetTempFileNameHtml();
             if (file.Length > 0)
             {
                 using (var stream = System.IO.File.Create(filePath))

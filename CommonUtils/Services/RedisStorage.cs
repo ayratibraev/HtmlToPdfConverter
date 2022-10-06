@@ -6,10 +6,15 @@ namespace CommonUtils.Services;
 
 public sealed class RedisStorage : IStorage
 {
+    private readonly IFileSystem _fileSystem;
     private readonly IDatabase _db;
 
-    public RedisStorage()
+    private static string KeyHtml => "html_file";
+    private static string KeyPdf => "pdf_file";
+
+    public RedisStorage(IFileSystem fileSystem)
     {
+        _fileSystem = fileSystem;
         var redis = ConnectionMultiplexer.Connect("localhost");
         _db = redis.GetDatabase();
     }
@@ -17,6 +22,7 @@ public sealed class RedisStorage : IStorage
     private void Upload(string filePath, string key)
     {
         _db.StringSet(key, File.ReadAllBytes(filePath));
+        _fileSystem.DeleteFile(filePath);
     }
 
     private string? Download(string key)
@@ -28,29 +34,33 @@ public sealed class RedisStorage : IStorage
         var value = getResult.Result;
 
         if (!value.HasValue) return null;
+
+        var path = 
+            key == KeyHtml 
+                ? _fileSystem.GetTempFileNameHtml()
+                : _fileSystem.GetTempFileNamePdf();
         
-        var path = Path.GetTempFileName();
-        File.WriteAllBytes(path, new UTF8Encoding().GetBytes(value.ToString()));
+        File.WriteAllBytes(path, value);
         return path;
     }
 
     public void UploadHtml(string filePath)
     {
-        Upload(filePath, "html_file");
+        Upload(filePath, KeyHtml);
     }
 
     public string? DownloadHtml()
     {
-        return Download("html_file");
+        return Download(KeyHtml);
     }
 
     public void UploadPdf(string filePath)
     {
-        Upload(filePath, "pdf_file");
+        Upload(filePath, KeyPdf);
     }
 
     public string? DownloadPdf()
     {
-        return Download("pdf_file");
+        return Download(KeyPdf);
     }
 }

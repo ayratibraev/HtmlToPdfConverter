@@ -17,6 +17,7 @@ builder.Services.AddMediatR(typeof(Program));
 builder.Services.AddHostedService<HtmlReadyCheckHostedService>();
 builder.Services.AddSingleton<IStorage, RedisStorage>();
 builder.Services.AddTransient<IPdfConverter, PdfConverter>();
+builder.Services.AddSingleton<IFileSystem, FileSystem>();
 
 var app = builder.Build();
 
