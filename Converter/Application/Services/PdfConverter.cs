@@ -20,6 +20,7 @@ public sealed class PdfConverter : IPdfConverter
         {
             Headless = true
         });
+            
         var page = await browser.NewPageAsync();
         page.DefaultTimeout = 5000;
         await page.GoToAsync("file://" + filePath, WaitUntilNavigation.Networkidle2);

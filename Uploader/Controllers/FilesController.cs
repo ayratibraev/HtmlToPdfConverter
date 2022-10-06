@@ -39,7 +39,10 @@ namespace Uploader.Controllers
         [HttpGet("download")]
         public async Task<IActionResult> DownloadFile([FromQuery] string fileName)
         {
-            var filePath = Path.Combine(Path.GetTempPath(), fileName);
+            var filePath = 
+                Path.Combine(
+                    Path.GetDirectoryName(_fileSystem.GetTempFileNamePdf()),
+                    fileName); 
             var memoryStream = new MemoryStream();
             using (var stream = new FileStream(filePath, FileMode.Open))
             {
@@ -47,7 +50,7 @@ namespace Uploader.Controllers
             }
             memoryStream.Position = 0;
 
-            return File(memoryStream, "text/html", Path.GetFileName(filePath));
+            return File(memoryStream, "application/pdf", Path.GetFileName(filePath));
         }
     }
 }

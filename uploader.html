@@ -20,6 +20,7 @@
 </dl>
 </body>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     "use strict";
     document.getElementById('submit').addEventListener('click', () => {
@@ -38,6 +39,34 @@
             .then(response => document.querySelector('output').textContent = response)
             .catch(error => document.querySelector('output').textContent = error);
     });
+	
+	
+	const connection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:7123/pdfReady")
+    .configureLogging(signalR.LogLevel.Information)
+	.withAutomaticReconnect()
+    .build();
+
+	async function start() {
+		try {
+			await connection.start();
+			console.log("SignalR Connected.");
+		} catch (err) {
+			console.log(err);
+			setTimeout(start, 5000);
+		}
+	};
+	
+	connection.on('SendPdfReady', (url) => {
+		document.querySelector('output').textContent = 'Ссылка на ваш файл :' + url;
+	});
+	
+	connection.onclose(async () => {
+		await start();
+	});
+
+	// Start the connection.
+	start();
     
 </script>
 
