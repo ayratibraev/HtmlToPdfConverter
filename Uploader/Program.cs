@@ -18,9 +18,15 @@ builder.Services.AddCors();
 builder.Services.AddSignalR();
 
 builder.Services.AddHostedService<PdfReadyCheckHostedService>();
-builder.Services.AddSingleton<IStorage, RedisStorage>();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
-
+builder.Services.AddSingleton<IStorage>(x =>
+{
+    var redisSection = builder.Configuration.GetSection("Redis");
+    return new RedisStorage(
+        redisSection.GetValue<string>("host"),
+        redisSection.GetValue<int>("port"),
+        x.GetRequiredService<IFileSystem>());
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

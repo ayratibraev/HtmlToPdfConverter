@@ -19,18 +19,21 @@ public sealed class PdfDownloadedHandler : INotificationHandler<PdfDownloadedNot
 {
     private readonly ILogger<PdfDownloadedHandler> _logger;
     private readonly IHubContext<MessageHub, IMessageHubClient> _hubContext;
+    private readonly IConfiguration _configuration;
 
-    public PdfDownloadedHandler(ILogger<PdfDownloadedHandler> logger, IHubContext<MessageHub, IMessageHubClient> hubContext)
+    public PdfDownloadedHandler(ILogger<PdfDownloadedHandler> logger, 
+            IHubContext<MessageHub, IMessageHubClient> hubContext,
+            IConfiguration configuration)
     {
         _logger = logger;
         _hubContext = hubContext;
+        _configuration = configuration;
     }
 
     public Task Handle(PdfDownloadedNotification notification, CancellationToken cancellationToken)
     {
-        // TODO: Вынести в нормальное место
         _hubContext.Clients.All.SendPdfReady(
-            "https://localhost:7123/api/files/download?fileName="
+            _configuration.GetValue<string>("uploadPdfUrl")
             + Path.GetFileName(notification.FilePath));
         return Task.CompletedTask;
     }

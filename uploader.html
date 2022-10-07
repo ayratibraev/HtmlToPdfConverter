@@ -17,15 +17,38 @@
     <div style="margin-top:15px">
         <output name="result"></output>
     </div>
+	<div style="margin-top:15px">
+        <div id="loading"></div>
+    </div>
 </dl>
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     "use strict";
+	
+	var loading = false;
+	var loadingInterval;
+	
     document.getElementById('submit').addEventListener('click', () => {
         let file = document.getElementById("file").files[0];
         let formData = new FormData();
+		
+		if(loading === false) {
+			loading = true;
+			let i = 0;
+			let array = ['|', '/', '–', '\\'];
+			loadingInterval = setInterval(() => {
+				if(loading) {
+					document.getElementById("loading").textContent = array[i];
+					i++;
+					if(i >= 3) {
+						i = 0;
+					}				
+				}
+			}, 500);
+		}
+		
         formData.append('file', file);
         formData.append('fileName', file.name);        
         fetch('https://localhost:7123/api/files/upload', {method: "POST", body: formData})
@@ -42,10 +65,10 @@
 	
 	
 	const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:7123/pdfReady")
-    .configureLogging(signalR.LogLevel.Information)
-	.withAutomaticReconnect()
-    .build();
+		.withUrl("https://localhost:7123/pdfReady")
+		.configureLogging(signalR.LogLevel.Information)
+		.withAutomaticReconnect()
+		.build();
 
 	async function start() {
 		try {
@@ -58,7 +81,9 @@
 	};
 	
 	connection.on('SendPdfReady', (url) => {
-		document.querySelector('output').textContent = 'Ссылка на ваш файл :' + url;
+		loading = false;
+		clearInterval(loadingInterval);
+		document.querySelector('output').innerHTML = "<a href=" + url +">Ссылка на ваш файл</a>";
 	});
 	
 	connection.onclose(async () => {

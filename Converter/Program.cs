@@ -15,9 +15,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program));
 builder.Services.AddHostedService<HtmlReadyCheckHostedService>();
-builder.Services.AddSingleton<IStorage, RedisStorage>();
 builder.Services.AddTransient<IPdfConverter, PdfConverter>();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
+builder.Services.AddSingleton<IStorage>(x =>
+{
+    var redisSection = builder.Configuration.GetSection("Redis");
+    return new RedisStorage(
+        redisSection.GetValue<string>("host"),
+        redisSection.GetValue<int>("port"),
+        x.GetRequiredService<IFileSystem>());
+});
 
 var app = builder.Build();
 
