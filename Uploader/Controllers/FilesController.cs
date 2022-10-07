@@ -11,28 +11,38 @@ namespace Uploader.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IFileSystem _fileSystem;
+        private readonly ILogger<FilesController> _logger;
 
-        public FilesController(IMediator mediator, IFileSystem fileSystem)
+        public FilesController(IMediator mediator, IFileSystem fileSystem, ILogger<FilesController> logger)
         {
             _mediator = mediator;
             _fileSystem = fileSystem;
+            _logger = logger;
         }
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
         {
-            var filePath = _fileSystem.GetTempFileNameHtml();
-            if (file.Length > 0)
+            try
             {
-                using (var stream = System.IO.File.Create(filePath))
+                var filePath = _fileSystem.GetTempFileNameHtml();
+                if (file.Length > 0)
                 {
-                    await file.CopyToAsync(stream);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
                 }
+
+                await _mediator.Publish(new HtmlUploadedNotification(filePath));
+
+                return Ok("Файл загружен. Вам придет ссылка для загрузки конвертированного файла.");
             }
-
-            await _mediator.Publish(new HtmlUploadedNotification(filePath));
-
-            return Ok(new { name = Path.GetFileName(filePath), file.Length });
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Loading failed. {0}.{1}", HttpContext.Request);
+                return BadRequest("Произошла ошибка.");
+            }
         }
         
         // Just for check in docker 
