@@ -12,22 +12,22 @@ public sealed class RedisStorage : IStorage
     private static string KeyHtml => "html_file";
     private static string KeyPdf => "pdf_file";
 
-    public RedisStorage(string host, int port, IFileSystem fileSystem)
+    public RedisStorage(string connectionString, IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
 
-        var config = new ConfigurationOptions()
-        {
-            KeepAlive = 0,
-            AllowAdmin = true,
-            EndPoints = { { host, port } },
-            ConnectTimeout = 5000,
-            ConnectRetry = 5,
-            SyncTimeout = 5000,
-            AbortOnConnectFail = false,
-        };
-        
-        var redis = ConnectionMultiplexer.Connect(config);
+        // var config = new ConfigurationOptions()
+        // {
+        //     KeepAlive = 0,
+        //     AllowAdmin = true,
+        //     EndPoints = { { host, port } },
+        //     ConnectTimeout = 5000,
+        //     ConnectRetry = 5,
+        //     SyncTimeout = 5000,
+        //     AbortOnConnectFail = false,
+        // };
+
+        var redis = ConnectionMultiplexer.Connect(connectionString);
         _db = redis.GetDatabase();
     }
 

@@ -19,12 +19,15 @@ builder.Services.AddSignalR();
 
 builder.Services.AddHostedService<PdfReadyCheckHostedService>();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
+
+var a = Environment.GetEnvironmentVariables();
+
 builder.Services.AddSingleton<IStorage>(x =>
 {
     var redisSection = builder.Configuration.GetSection("Redis");
     return new RedisStorage(
-        redisSection.GetValue<string>("host"),
-        redisSection.GetValue<int>("port"),
+        Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING", EnvironmentVariableTarget.Process)
+            ?? "localhost",
         x.GetRequiredService<IFileSystem>());
 });
 var app = builder.Build();

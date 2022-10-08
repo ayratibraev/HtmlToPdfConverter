@@ -5,7 +5,8 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Converter/Converter.csproj", "Converter/"]
+COPY ["Converter.csproj", "Converter/"]
+COPY ["../CommonUtils.csproj", "CommonUtils/"]
 RUN dotnet restore "Converter/Converter.csproj"
 COPY . .
 WORKDIR "/src/Converter"
