@@ -5,6 +5,8 @@ using Converter.Application.Services;
 using Converter.Application.Services.Interfaces;
 using MediatR;
 
+ThreadPool.SetMinThreads(10, 10);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,17 +16,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program));
-builder.Services.AddHostedService<HtmlReadyCheckHostedService>();
 builder.Services.AddTransient<IPdfConverter, PdfConverter>();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
 builder.Services.AddSingleton<IStorage>(x =>
 {
     var redisSection = builder.Configuration.GetSection("Redis");
     return new RedisStorage(
-        Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING", EnvironmentVariableTarget.Process)
-            ?? "localhost",
-        x.GetRequiredService<IFileSystem>());
+        builder.Configuration.GetValue<string>("RedisConnectionString"),
+        x.GetRequiredService<IFileSystem>(),
+        x.GetRequiredService<ILogger<RedisStorage>>());
 });
+
+builder.Services.AddHostedService<HtmlReadyCheckHostedService>();
 
 var app = builder.Build();
 

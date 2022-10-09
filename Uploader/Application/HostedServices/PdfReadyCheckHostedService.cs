@@ -30,10 +30,17 @@ public sealed class PdfReadyCheckHostedService: IHostedService, IDisposable
 
     private void DoWork(object? state)
     {
-        var filePath = _storage.DownloadPdf();
-        if (string.IsNullOrEmpty(filePath) == false)
+        try
         {
-            _mediatr.Publish(new PdfDownloadedNotification(filePath));   
+            var filePath = _storage.DownloadPdf();
+            if (string.IsNullOrEmpty(filePath) == false)
+            {
+                _mediatr.Publish(new PdfDownloadedNotification(filePath));
+            }
+        }
+        catch (Exception exception)
+        {
+            _logger.LogInformation("Exception. {0}", exception);
         }
     }
 

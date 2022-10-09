@@ -1,5 +1,6 @@
-using System.Text;
+using CommonUtils.Application.LogEvent;
 using CommonUtils.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace CommonUtils.Services;
@@ -7,53 +8,85 @@ namespace CommonUtils.Services;
 public sealed class RedisStorage : IStorage
 {
     private readonly IFileSystem _fileSystem;
-    private readonly IDatabase _db;
+    private readonly ILogger<RedisStorage> _logger;
+    private IDatabase _db;
 
     private static string KeyHtml => "html_file";
     private static string KeyPdf => "pdf_file";
 
-    public RedisStorage(string connectionString, IFileSystem fileSystem)
+    public RedisStorage(string connectionString, IFileSystem fileSystem, ILogger<RedisStorage> logger)
     {
         _fileSystem = fileSystem;
+        _logger = logger;
+        
+        Connect(connectionString);
+    }
 
-        // var config = new ConfigurationOptions()
-        // {
-        //     KeepAlive = 0,
-        //     AllowAdmin = true,
-        //     EndPoints = { { host, port } },
-        //     ConnectTimeout = 5000,
-        //     ConnectRetry = 5,
-        //     SyncTimeout = 5000,
-        //     AbortOnConnectFail = false,
-        // };
-
-        var redis = ConnectionMultiplexer.Connect(connectionString);
-        _db = redis.GetDatabase();
+    private void Connect(string connectionString)
+    {
+        try
+        {
+            var redis = ConnectionMultiplexer.Connect(connectionString);
+            _db = redis.GetDatabase();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(RedisLogEvent.Upload,
+                exception,
+                "RedisStorage.Connect failed. connectionString: {connectionString}", 
+                connectionString);
+            
+            throw;
+        }
     }
 
     private void Upload(string filePath, string key)
     {
-        _db.StringSet(key, File.ReadAllBytes(filePath));
-        _fileSystem.DeleteFile(filePath);
+        try
+        {
+            _db.StringSet(key, File.ReadAllBytes(filePath));
+            _fileSystem.DeleteFile(filePath);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(RedisLogEvent.Upload,
+                exception,
+                "RedisStorage.Upload failed. filepath: {filepath}, key: {key}", 
+                filePath, key);
+            
+            throw;
+        }
     }
 
     private string? Download(string key)
     {
-        var tran = _db.CreateTransaction();
-        var getResult = tran.StringGetAsync(key);
-        tran.KeyDeleteAsync(key);
-        tran.Execute();
-        var value = getResult.Result;
+        try
+        {
+            var tran = _db.CreateTransaction();
+            var getResult = tran.StringGetAsync(key);
+            tran.KeyDeleteAsync(key);
+            tran.Execute();
+            var value = getResult.Result;
 
-        if (!value.HasValue) return null;
+            if (!value.HasValue) return null;
 
-        var path = 
-            key == KeyHtml 
-                ? _fileSystem.GetTempFileNameHtml()
-                : _fileSystem.GetTempFileNamePdf();
+            var path = 
+                key == KeyHtml 
+                    ? _fileSystem.GetTempFileNameHtml()
+                    : _fileSystem.GetTempFileNamePdf();
         
-        File.WriteAllBytes(path, value);
-        return path;
+            File.WriteAllBytes(path, value);
+            return path;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(RedisLogEvent.Download,
+                exception,
+                "RedisStorage.Upload failed.key: {key}", 
+                key);
+
+            throw;
+        }
     }
 
     public void UploadHtml(string filePath)
