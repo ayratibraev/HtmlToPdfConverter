@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  uploader:
+    image: ${DOCKER_REGISTRY-}uploader
+    build:
+      context: .
+      dockerfile: ./Dockerfile_Uploader
+    depends_on: [ redis ] 
+
+  converter:
+    image: ${DOCKER_REGISTRY-}converter
+    build:
+      context: .
+      dockerfile: ./Dockerfile_Converter
+    depends_on: [ redis ]
+
+  redis:
+   image: redis

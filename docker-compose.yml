@@ -1,0 +1,31 @@
+version: "2"
+services:
+  redis:
+    image: 'redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_PORT=6379
+      - REDIS_CONNECTION_STRING=redis://redis:6379
+    command: [ "redis-server" ]
+    container_name: redis
+    restart: unless-stopped
+  uploader:    
+    container_name: uploader
+    environment:
+      - ASPNETCORE_URLS=http://+:8083
+    build:      
+      context: ./
+      dockerfile: ./Dockerfile_Uploader
+    depends_on: [ redis ]        
+    ports:
+      - "8081:8081"
+  converter:    
+    container_name: converter
+    environment:
+      - ASPNETCORE_URLS=http://+:8084
+    build:      
+      context: ./
+      dockerfile: ./Dockerfile_Converter
+    depends_on: [ redis ]        
+    ports:
+      - "8082:8082"
