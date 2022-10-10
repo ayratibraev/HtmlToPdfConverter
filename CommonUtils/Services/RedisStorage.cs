@@ -82,7 +82,7 @@ public sealed class RedisStorage : IStorage
         {
             _logger.LogError(RedisLogEvent.Download,
                 exception,
-                "RedisStorage.Upload failed.key: {key}", 
+                "RedisStorage.Download failed.key: {key}", 
                 key);
 
             throw;

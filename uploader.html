@@ -51,13 +51,13 @@
 		
         formData.append('file', file);
         formData.append('fileName', file.name);        
-        fetch('https://localhost:7123/api/files/upload', {method: "POST", body: formData})
+        fetch('https://localhost:8081/api/files/upload', {method: "POST", body: formData})
             .then(response => response.text())
             .then(response => document.querySelector('output').textContent = response);
     });
 
     document.getElementById('ping').addEventListener('click', () => {
-        fetch('https://localhost:7123/api/ping', {method: "GET"})
+        fetch('https://localhost:8081/api/ping', {method: "GET"})
             .then(response => response.text())
             .then(response => document.querySelector('output').textContent = response)
             .catch(error => document.querySelector('output').textContent = error);
@@ -65,7 +65,7 @@
 	
 	
 	const connection = new signalR.HubConnectionBuilder()
-		.withUrl("https://localhost:7123/pdfReady")
+		.withUrl("https://localhost:8081/pdfReady")
 		.configureLogging(signalR.LogLevel.Information)
 		.withAutomaticReconnect()
 		.build();
