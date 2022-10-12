@@ -1,6 +1,6 @@
 # HtmlToPdfConverter
 
-###### Instalation:
+Installation:
 > docker compose up
 
 Open uploader.html
