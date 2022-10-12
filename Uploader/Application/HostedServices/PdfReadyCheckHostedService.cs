@@ -40,7 +40,7 @@ public sealed class PdfReadyCheckHostedService: IHostedService, IDisposable
         }
         catch (Exception exception)
         {
-            _logger.LogInformation("Exception. {0}", exception);
+            _logger.LogInformation(exception, "PdfReadyCheckHostedService.DoWork");
         }
     }
 

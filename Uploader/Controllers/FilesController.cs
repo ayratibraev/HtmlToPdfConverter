@@ -33,14 +33,14 @@ namespace Uploader.Controllers
                         await file.CopyToAsync(stream);
                     }
                 }
-
+    _logger.LogInformation($"File uploaded: {filePath}");
                 await _mediator.Publish(new HtmlUploadedNotification(filePath));
 
                 return Ok("Файл загружен. Вам придет ссылка для загрузки конвертированного файла.");
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Loading failed. {0}.{1}", HttpContext.Request);
+                // _logger.LogError(exception, "Loading failed. {0}", HttpContext.Request);
                 return BadRequest("Произошла ошибка.");
             }
         }
@@ -52,7 +52,8 @@ namespace Uploader.Controllers
             var filePath = 
                 Path.Combine(
                     Path.GetDirectoryName(_fileSystem.GetTempFileNamePdf()),
-                    fileName); 
+                    fileName);
+            return Ok(filePath);
             var memoryStream = new MemoryStream();
             using (var stream = new FileStream(filePath, FileMode.Open))
             {

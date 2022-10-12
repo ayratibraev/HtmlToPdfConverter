@@ -18,14 +18,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program));
 builder.Services.AddTransient<IPdfConverter, PdfConverter>();
 builder.Services.AddSingleton<IFileSystem, FileSystem>();
-builder.Services.AddSingleton<IStorage>(x =>
-{
-    var redisSection = builder.Configuration.GetSection("Redis");
-    return new RedisStorage(
-        builder.Configuration.GetValue<string>("RedisConnectionString"),
-        x.GetRequiredService<IFileSystem>(),
-        x.GetRequiredService<ILogger<RedisStorage>>());
-});
+
+builder.Services.AddSingleton<IStorage>(x => new RedisStorage(
+    builder.Configuration.GetValue<string>("RedisConnectionString"),
+    x.GetRequiredService<IFileSystem>(),
+    x.GetRequiredService<ILogger<RedisStorage>>()));
 
 builder.Services.AddHostedService<HtmlReadyCheckHostedService>();
 
@@ -38,7 +35,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

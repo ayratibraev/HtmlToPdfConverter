@@ -1,9 +1,5 @@
-using System.Runtime.InteropServices;
-using CommonUtils.Services.Interfaces;
 using Converter.Application.Services.Interfaces;
 using MediatR;
-using PuppeteerSharp;
-using StackExchange.Redis;
 
 namespace Converter.Application.Notifications;
 
@@ -21,11 +17,13 @@ public sealed class HtmlUploadedHandler : INotificationHandler<HtmlUploadedNotif
 {
     private readonly IMediator _mediator;
     private readonly IPdfConverter _pdfConverter;
+    private readonly ILogger<HtmlUploadedHandler> _logger;
 
-    public HtmlUploadedHandler(IMediator mediator, IPdfConverter pdfConverter)
+    public HtmlUploadedHandler(IMediator mediator, IPdfConverter pdfConverter, ILogger<HtmlUploadedHandler> logger)
     {
         _mediator = mediator;
         _pdfConverter = pdfConverter;
+        this._logger = logger;
     }
 
     public async Task Handle(HtmlUploadedNotification notification, CancellationToken cancellationToken)

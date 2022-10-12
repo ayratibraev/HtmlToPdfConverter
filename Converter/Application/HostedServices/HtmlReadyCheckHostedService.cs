@@ -37,6 +37,7 @@ public sealed class HtmlReadyCheckHostedService: IHostedService, IDisposable
             {
                 _mediatr.Publish(new HtmlUploadedNotification(filePath));
             }
+            
         }
         catch (Exception exception)
         {

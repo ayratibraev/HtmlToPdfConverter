@@ -7,23 +7,28 @@ namespace Converter.Application.Services;
 public sealed class PdfConverter : IPdfConverter
 {
     private readonly IFileSystem _fileSystem;
+    private readonly ILogger<PdfConverter> _logger;
 
-    public PdfConverter(IFileSystem fileSystem)
+    public PdfConverter(IFileSystem fileSystem, ILogger<PdfConverter> logger)
     {
         _fileSystem = fileSystem;
+        _logger = logger;
     }
 
     public async Task<string> Convert(string filePath)
     {
-        await new BrowserFetcher().DownloadAsync();
-        var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions()
         {
-            Headless = true
+            Headless = true,
+            Args = new [] {
+                "--disable-gpu",
+                "--disable-dev-shm-usage",
+                "--disable-setuid-sandbox",
+                "--no-sandbox"}
         });
-            
-        var page = await browser.NewPageAsync();
-        page.DefaultTimeout = 5000;
+        await using var page = await browser.NewPageAsync();
         await page.GoToAsync("file://" + filePath, WaitUntilNavigation.Networkidle2);
+        
         var pdfPath = Path.ChangeExtension(filePath, "pdf");
         await page.PdfAsync(pdfPath);
         _fileSystem.DeleteFile(filePath);
